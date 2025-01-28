@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gezeerz Sport Limited</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    .input-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    input {
+      padding: 8px;
+      width: 100%;
+      max-width: 300px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>Geezers Sport Grouping App</h1>
+  <div class="input-group">
+    <label for="groups">Number of Sets:</label>
+    <input type="number" id="groups" min="2" placeholder="Enter number of groups">
+  </div>
+  <div class="input-group">
+    <label for="people">Number of Players:</label>
+    <input type="number" id="people" min="1" placeholder="Enter number of players">
+  </div>
+  <button id="startButton">Start</button>
+
+  <script>
+    document.getElementById('startButton').addEventListener('click', function () {
+      const groups = parseInt(document.getElementById('groups').value);
+      const people = parseInt(document.getElementById('people').value);
+
+      if (!groups || groups < 2 || !people || people < 1) {
+        alert('Please enter valid numbers for groups and people.');
+        return;
+      }
+
+      const groupAssignments = [];
+      for (let i = 1; i <= groups; i++) {
+        groupAssignments.push(...Array(Math.floor(people / groups)).fill(i));
+      }
+      while (groupAssignments.length < people) {
+        groupAssignments.push(Math.floor(Math.random() * groups) + 1);
+      }
+
+      // Shuffle the array
+      groupAssignments.sort(() => Math.random() - 0.5);
+
+      let currentIndex = 0;
+      document.getElementById('startButton').onclick = function () {
+        if (currentIndex >= people) {
+          alert('All people have been assigned groups.');
+          return;
+        }
+        alert(`You belong to Group ${groupAssignments[currentIndex]}`);
+        currentIndex++;
+      };
+    });
+  </script>
+</body>
+</html>
