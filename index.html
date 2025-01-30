@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gezeerz Sport Limited</title>
+  <title>Geezerz Sport Limited</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -32,6 +32,22 @@
     button:hover {
       background-color: #0056b3;
     }
+    #result {
+      margin-top: 20px;
+      padding: 10px;
+      border-radius: 5px;
+      display: none;
+    }
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .info {
+      background-color: #cce5ff;
+      color: #004085;
+      border: 1px solid #b8daff;
+    }
   </style>
 </head>
 <body>
@@ -45,37 +61,67 @@
     <input type="number" id="people" min="1" placeholder="Enter number of players">
   </div>
   <button id="startButton">Start</button>
+  <div id="result"></div>
 
   <script>
-    document.getElementById('startButton').addEventListener('click', function () {
+    const startButton = document.getElementById('startButton');
+    const resultDiv = document.getElementById('result');
+    let groupAssignments = [];
+    let currentIndex = 0;
+    let isSetup = false;
+
+    function setupGroups() {
       const groups = parseInt(document.getElementById('groups').value);
       const people = parseInt(document.getElementById('people').value);
 
       if (!groups || groups < 2 || !people || people < 1) {
-        alert('Please enter valid numbers for groups and people.');
-        return;
+        showMessage('Please enter valid numbers for groups and people.', 'error');
+        return false;
       }
 
-      const groupAssignments = [];
+      groupAssignments = [];
       for (let i = 1; i <= groups; i++) {
         groupAssignments.push(...Array(Math.floor(people / groups)).fill(i));
       }
+
+      // Handle remaining players
       while (groupAssignments.length < people) {
         groupAssignments.push(Math.floor(Math.random() * groups) + 1);
       }
 
       // Shuffle the array
-      groupAssignments.sort(() => Math.random() - 0.5);
+      for (let i = groupAssignments.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [groupAssignments[i], groupAssignments[j]] = [groupAssignments[j], groupAssignments[i]];
+      }
 
-      let currentIndex = 0;
-      document.getElementById('startButton').onclick = function () {
-        if (currentIndex >= people) {
-          alert('All people have been assigned groups.');
-          return;
+      currentIndex = 0;
+      isSetup = true;
+      startButton.textContent = 'Next Assignment';
+      return true;
+    }
+
+    function showMessage(message, type) {
+      resultDiv.style.display = 'block';
+      resultDiv.textContent = message;
+      resultDiv.className = type === 'error' ? 'info' : 'success';
+    }
+
+    startButton.addEventListener('click', function() {
+      if (!isSetup) {
+        if (setupGroups()) {
+          showMessage(`Click 'Next Assignment' to start assigning groups`, 'success');
         }
-        alert(`You belong to Group ${groupAssignments[currentIndex]}`);
-        currentIndex++;
-      };
+      } else {
+        if (currentIndex >= groupAssignments.length) {
+          showMessage('All players have been assigned to groups!', 'success');
+          startButton.textContent = 'Start New Groups';
+          isSetup = false;
+        } else {
+          showMessage(`Player ${currentIndex + 1} belongs to Group ${groupAssignments[currentIndex]}`, 'success');
+          currentIndex++;
+        }
+      }
     });
   </script>
 </body>
